@@ -1,13 +1,213 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  CUSTOMER
+}
+
+enum CompanyStatus {
+  ACTIVE
+  PAUSED
+  CLOSED
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  NEW
+  IN_PROGRESS
+  WAITING_CUSTOMER
+  DONE
+  EXPIRED
+}
+
+enum DocumentCategory {
+  INVOICE_IN
+  INVOICE_OUT
+  BANK
+  NAV
+  CONTRACT
+  PAYROLL
+  OTHER
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String?
+  role          Role      @default(CUSTOMER)
+  
+  // Relations
+  companyId     String?
+  company       Company?  @relation(fields: [companyId], references: [id])
+  
+  // 2FA Settings
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret  String?
+  
+  // Logs & Audit
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  messagesSent  Message[] @relation("MessageSender")
+  tasksAssigned Task[]    @relation("TaskAssignee")
+  documentsUploaded Document[]
+  auditLogs     AuditLog[]
+}
+
+model Company {
+  id                String        @id @default(uuid())
+  name              String
+  shortName         String?
+  taxNumber         String?
+  companyRegNumber  String?
+  address           String?
+  mailingAddress    String?
+  email             String?
+  phone             String?
+  contactPerson     String?
+  companyType       String?
+  accountingFee     Float?
+  status            CompanyStatus @default(ACTIVE)
+  
+  users             User[]
+  threads           Thread[]
+  documents         Document[]
+  tasks             Task[]
+
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+}
+
+model Thread {
+  id          String    @id @default(uuid())
+  subject     String
+  companyId   String
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  messages    Message[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Message {
+  id          String    @id @default(uuid())
+  body        String // Can be large HTML text
+  threadId    String
+  thread      Thread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  
+  senderId    String
+  sender      User      @relation("MessageSender", fields: [senderId], references: [id])
+  
+  readAt      DateTime?
+  
+  attachments Attachment[]
+  
+  createdAt   DateTime  @default(now())
+}
+
+model Document {
+  id          String           @id @default(uuid())
+  originalName String
+  storageKey  String           @unique
+  size        Int
+  type        String           // e.g. application/pdf, image/jpeg
+  category    DocumentCategory
+  notes       String?
+  
+  uploaderId  String
+  uploader    User             @relation(fields: [uploaderId], references: [id])
+  
+  companyId   String
+  company     Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime         @default(now())
+}
+
+model Attachment {
+  id          String    @id @default(uuid())
+  messageId   String
+  message     Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  originalName String
+  storageKey  String    @unique
+  size        Int
+  
+  createdAt   DateTime  @default(now())
+}
+
+model Task {
+  id          String      @id @default(uuid())
+  title       String
+  description String?
+  deadline    DateTime?
+  priority    Priority    @default(NORMAL)
+  status      TaskStatus  @default(NEW)
+  isRecurring Boolean     @default(false)
+  recurrenceRule String?  // e.g. cron string or custom enum
+  
+  companyId   String
+  company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  assigneeId  String?
+  assignee    User?       @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  
+  taskInstances TaskInstance[]
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model TaskInstance {
+  id          String      @id @default(uuid())
+  taskId      String
+  task        Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  dueDate     DateTime
+  completedAt DateTime?
+}
+
+model InvitationToken {
+  id          String   @id @default(uuid())
+  token       String   @unique
+  email       String
+  companyId   String
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id          String   @id @default(uuid())
+  token       String   @unique
+  email       String
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action      String
+  entity      String
+  entityId    String?
+  details     String?  // JSON string
+  createdAt   DateTime @default(now())
 }
