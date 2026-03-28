@@ -47,7 +47,7 @@ export default async function CompaniesPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {companies.map((company) => (
+            {companies.map((company: any) => (
               <TableRow key={company.id}>
                 <TableCell className="font-medium">{company.name}</TableCell>
                 <TableCell>{company.taxNumber || "-"}</TableCell>
