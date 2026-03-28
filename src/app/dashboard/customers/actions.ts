@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { randomUUID } from "crypto"
+import { sendInviteEmail } from "@/lib/email"
 
 export async function createCustomer(formData: FormData) {
   const session = await auth()
@@ -27,7 +28,7 @@ export async function createCustomer(formData: FormData) {
   }
 
   try {
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         name,
         email,
@@ -45,8 +46,16 @@ export async function createCustomer(formData: FormData) {
       }
     })
 
-    console.log(`[EMAIL SIMULATOR] Ügyfél meghívó (Jelszó beállító) link kiküldve: ${email}`)
-    console.log(`[EMAIL SIMULATOR] Link: http://localhost:3000/setup-password?token=${token}`)
+    const emailResponse = await sendInviteEmail({
+      email: newUser.email,
+      name: newUser.name || "",
+      token,
+    })
+
+    if (emailResponse.error) {
+      console.error("Az e-mail kiküldése sikertelen:", emailResponse.error)
+      return { success: `Ügyfél regisztrálva, de az email hibaüzenettel elutasítva: ${emailResponse.error}` }
+    }
 
   } catch (error) {
     return { error: "Hiba történt az ügyfél létrehozása közben." }

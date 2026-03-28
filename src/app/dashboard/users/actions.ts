@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { randomUUID } from "crypto"
+import { sendInviteEmail } from "@/lib/email"
 
 export async function createAdmin(formData: FormData) {
   const session = await auth()
@@ -26,7 +27,7 @@ export async function createAdmin(formData: FormData) {
   }
 
   try {
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         name,
         email,
@@ -44,8 +45,17 @@ export async function createAdmin(formData: FormData) {
       }
     })
 
-    console.log(`[EMAIL SIMULATOR] Meghívó elküldve az Adminnak: ${email}`)
-    console.log(`[EMAIL SIMULATOR] Link: http://localhost:3000/setup-password?token=${token}`)
+    // Email Kiküldés
+    const emailResponse = await sendInviteEmail({
+      email: newUser.email,
+      name: newUser.name || "",
+      token,
+    })
+
+    if (emailResponse.error) {
+      console.error("Az e-mail kiküldése sikertelen:", emailResponse.error)
+      return { success: `Munkatárs rögzítve, de a meghívó e-mail hibára futott: ${emailResponse.error}` }
+    }
 
   } catch (error) {
     return { error: "Hiba történt a felhasználó rögzítésekor." }
