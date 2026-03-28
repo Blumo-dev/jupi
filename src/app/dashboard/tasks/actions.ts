@@ -48,23 +48,23 @@ export async function createTask(formData: FormData) {
 
 export async function updateTaskStatus(formData: FormData) {
   const session = await auth()
-  if (!session?.user) return { error: "Beállítatlan munkamenet!" }
+  if (!session?.user) return;
 
   const taskId = formData.get("taskId")?.toString()
   const newStatus = formData.get("status")?.toString() as any
 
-  if (!taskId || !newStatus) return { error: "Hiányzó adatok." }
+  if (!taskId || !newStatus) return;
 
   try {
     const task = await prisma.task.findUnique({
       where: { id: taskId }
     })
     
-    if (!task) return { error: "Nem található a feladat." }
+    if (!task) return;
 
     // Security check: if CUSTOMER, they can only update tasks for their company
     if (session.user.role === "CUSTOMER" && task.companyId !== session.user.companyId) {
-      return { error: "Hozzáférés megtagadva!" }
+      return;
     }
 
     await prisma.task.update({
@@ -73,7 +73,8 @@ export async function updateTaskStatus(formData: FormData) {
     })
 
   } catch (error) {
-    return { error: "Sikertelen státusz frissítés." }
+    console.error(error)
+    return;
   }
 
   revalidatePath("/dashboard/tasks")
