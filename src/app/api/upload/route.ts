@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { randomUUID } from "crypto"
-import { writeFile } from "fs/promises"
-import path from "path"
+import { put } from "@vercel/blob"
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,21 +31,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Érvénytelen Cég azonosító." }, { status: 400 })
     }
 
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-
-    const storageKey = `${randomUUID()}-${file.name.replace(/[^a-zA-Z0-9.]/g, "_")}`
-    
-    // Save locally to public/uploads
-    const uploadDir = path.join(process.cwd(), "public/uploads")
-    const filePath = path.join(uploadDir, storageKey)
-    await writeFile(filePath, buffer)
+    // Vercel Blob Upload
+    const fileName = `${randomUUID()}-${file.name.replace(/[^a-zA-Z0-9.]/g, "_")}`
+    const blob = await put(fileName, file, { access: 'public' })
 
     // Create DB Document
     const document = await prisma.document.create({
       data: {
         originalName: file.name,
-        storageKey,
+        storageKey: blob.url,
         size: file.size,
         type: file.type,
         category: category as any,

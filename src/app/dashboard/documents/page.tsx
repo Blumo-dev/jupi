@@ -98,8 +98,8 @@ export default async function DocumentsPage(props: { searchParams: Promise<{ com
                 <TableCell>{doc.uploader?.name}</TableCell>
                 <TableCell>{new Date(doc.createdAt).toLocaleDateString("hu-HU")}</TableCell>
                 <TableCell className="text-right">
-                  <a href={`/uploads/${doc.storageKey}`} target="_blank" download>
-                    <Button variant="ghost" size="sm" title="Letöltés">
+                  <a href={doc.storageKey.startsWith('http') ? doc.storageKey : `/uploads/${doc.storageKey}`} target="_blank" rel="noopener noreferrer">
+                    <Button variant="ghost" size="sm" title="Letöltés / Megtekintés">
                       <Download className="h-4 w-4" />
                     </Button>
                   </a>
