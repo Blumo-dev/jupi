@@ -62,9 +62,9 @@ export default async function UsersPage() {
                 </TableCell>
                 <TableCell>{new Date(user.createdAt).toLocaleDateString("hu-HU")}</TableCell>
                 <TableCell className="text-right">
-                  {user.id !== session.user.id && (
-                    <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">Felfüggesztés</Button>
-                  )}
+                  <Link href={`/dashboard/users/${user.id}`}>
+                    <Button variant="ghost" size="sm">Részletek</Button>
+                  </Link>
                 </TableCell>
               </TableRow>
             ))}
