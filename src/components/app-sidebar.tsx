@@ -73,7 +73,7 @@ export function AppSidebar({ role, user }: { role: string, user: any }) {
             <span className="text-sm font-semibold truncate leading-tight">{user.name || "Névtelen Felhasználó"}</span>
             <span className="text-xs text-muted-foreground truncate">{user.email}</span>
             <span className="text-[10px] mt-1 uppercase text-primary font-bold">{role.replace("_", " ")}</span>
-            <span className="text-[10px] text-muted-foreground/50 mt-3 border-t pt-2">Build: v1.1.0 (260329)</span>
+            <span className="text-[10px] text-muted-foreground/50 mt-3 border-t pt-2">Build: #{process.env.NEXT_PUBLIC_GIT_SHA || "local"}</span>
         </div>
       </SidebarFooter>
     </Sidebar>
