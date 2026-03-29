@@ -53,6 +53,11 @@ model User {
   passwordHash  String?
   role          Role      @default(CUSTOMER)
   
+  phone         String?
+  idCardNumber  String?
+  address       String?
+  taxId         String?
+  
   // Relations
   companyId     String?
   company       Company?  @relation(fields: [companyId], references: [id])
@@ -82,6 +87,7 @@ model Company {
   email             String?
   phone             String?
   contactPerson     String?
+  kshNumber         String?
   companyType       String?
   accountingFee     Float?
   status            CompanyStatus @default(ACTIVE)

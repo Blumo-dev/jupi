@@ -61,7 +61,9 @@ export default async function CompaniesPage() {
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="sm">Szerkeszt</Button>
+                  <Link href={`/dashboard/companies/${company.id}`}>
+                    <Button variant="ghost" size="sm">Részletek</Button>
+                  </Link>
                 </TableCell>
               </TableRow>
             ))}
