@@ -11,7 +11,15 @@ export async function sendInviteEmail({
   name: string
   token: string
 }) {
-  const setupUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/setup-password?token=${token}`
+  // VERCEL_PROJECT_PRODUCTION_URL: a Vercel által automatikusan beillesztett, állandó production domain (pl. jupi.vercel.app)
+  // Ez nem változik deploy-onként, ellentétben a VERCEL_URL-lel.
+  const baseUrl =
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : null) ??
+    process.env.NEXT_PUBLIC_APP_URL ??
+    "http://localhost:3000"
+  const setupUrl = `${baseUrl}/setup-password?token=${token}`
 
   // Ha fejlesztői környezetben vagyunk, vagy nincs beállítva a Resend API kulcs, csak írjuk ki a terminálba (Fallback kód)
   if (process.env.NODE_ENV !== "production" || !process.env.RESEND_API_KEY) {
