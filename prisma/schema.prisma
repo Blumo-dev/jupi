@@ -217,3 +217,42 @@ model AuditLog {
   details     String?  // JSON string
   createdAt   DateTime @default(now())
 }
+
+// Singleton rendszer-beállítások (mindig 1 rekord, id = "system")
+model SystemSettings {
+  id                      String  @id @default("system")
+  
+  // Általános rendszerinformációk
+  systemName              String  @default("Jupi")
+  systemTimezone          String  @default("Europe/Budapest")
+  systemLanguage          String  @default("hu")
+  systemTheme             String  @default("light")
+  
+  // Feladat emlékeztetők
+  taskReminderDays        Int     @default(3)   // Hány napja lejegyezetlen feladatnál
+  taskReminderEnabled     Boolean @default(true)
+  
+  // Jelszaváltás kényszerítés
+  passwordExpiryDays      Int     @default(90)  // 0 = kiépitve/nem kötelező
+  
+  // 2FA beállítások
+  // "NONE" | "ADMIN" | "ALL"
+  twoFactorRequired       String  @default("NONE")
+  
+  // Email értesítések
+  emailNotificationsEnabled Boolean @default(true)
+  
+  // SMTP beállítások (ha nem Resend-et használ)
+  smtpEnabled     Boolean @default(false)
+  smtpHost        String?
+  smtpPort        Int?    // pl. 587
+  smtpUser        String?
+  smtpPassword    String? // Tárolt titkosítás nélkül — admin hozzáférés esetlén belátjaátja
+  smtpFromName    String? // pl. "Jupi Könyvelés"
+  smtpFromEmail   String? // pl. info@sajatceg.hu
+  
+  // Elérhetőség / Karbantartási üzemmód
+  maintenanceMode         Boolean @default(false)
+  
+  updatedAt               DateTime @updatedAt
+}
