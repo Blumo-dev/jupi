@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
 import { InitForm } from "./InitForm"
+import { getSystemSettings } from "../dashboard/settings/actions"
 
 export default async function InitPage() {
   const adminCount = await prisma.user.count({
@@ -12,9 +13,12 @@ export default async function InitPage() {
     redirect("/login")
   }
 
+  const settings = await getSystemSettings()
+  const systemName = settings?.systemName || "Jupi"
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/40 p-4">
-      <InitForm />
+      <InitForm systemName={systemName} />
     </div>
   )
 }

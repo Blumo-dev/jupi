@@ -236,7 +236,7 @@ export function SettingsForm({ initialSettings }: { initialSettings: any }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="smtpFromName">Feladó Neve</Label>
-                    <Input id="smtpFromName" name="smtpFromName" defaultValue={initialSettings.smtpFromName || "Jupi SaaS"} placeholder="Jupi Könyvelés" />
+                    <Input id="smtpFromName" name="smtpFromName" defaultValue={initialSettings.smtpFromName || "Saját SaaS"} placeholder="Pl. Könyvelőiroda Neve" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="smtpFromEmail">Feladó Email Címe</Label>

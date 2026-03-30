@@ -1,8 +1,12 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Building2, ArrowRight } from "lucide-react"
+import { getSystemSettings } from "./dashboard/settings/actions"
 
-export default function Home() {
+export default async function Home() {
+  const settings = await getSystemSettings()
+  const systemName = settings?.systemName || "Jupi"
+
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <div className="max-w-3xl text-center space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -24,7 +28,7 @@ export default function Home() {
 
         {/* Hero Paragraph */}
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Üdvözlünk a Jupi Ügyfélportálon! Kezeld a cégeid dokumentumait, kövesd nyomon a határidőket és kommunikálj közvetlenül a könyvelőddel egyetlen letisztult felületen.
+          Üdvözlünk a {systemName} Ügyfélportálon! Kezeld a cégeid dokumentumait, kövesd nyomon a határidőket és kommunikálj közvetlenül a könyvelőddel egyetlen letisztult felületen.
         </p>
 
         {/* Action Buttons */}

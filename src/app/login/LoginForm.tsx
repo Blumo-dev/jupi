@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
-export function LoginForm() {
+export function LoginForm({ systemName }: { systemName: string }) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
@@ -33,7 +33,7 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md mx-auto shadow-lg border-primary/20">
       <CardHeader className="space-y-2">
-        <CardTitle className="text-3xl font-bold tracking-tight text-center text-primary">Jupi Portal</CardTitle>
+        <CardTitle className="text-3xl font-bold tracking-tight text-center text-primary">{systemName} Portal</CardTitle>
         <CardDescription className="text-center">
           Jelentkezz be a fiókodba a folytatáshoz
         </CardDescription>

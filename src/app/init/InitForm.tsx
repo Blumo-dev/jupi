@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
 
-export function InitForm() {
+export function InitForm({ systemName }: { systemName?: string }) {
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -33,7 +33,7 @@ export function InitForm() {
   return (
     <Card className="w-full max-w-md mx-auto mt-20 shadow-lg">
       <CardHeader className="space-y-2">
-        <CardTitle className="text-2xl text-center text-primary">Jupi Init</CardTitle>
+        <CardTitle className="text-2xl text-center text-primary">{systemName || "Jupi"} Init</CardTitle>
         <CardDescription className="text-center">
           Első indítás. Hozd létre a rendszergazdai (Super Admin) fiókodat. Ez a felület a létrehozás után végleg lezáródik.
         </CardDescription>

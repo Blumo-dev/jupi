@@ -26,7 +26,10 @@ async function getEmailTransporter() {
     }
   }
 
-  return { type: "resend", from: "Jupi Ügyfélportál <onboarding@resend.dev>" }
+  return { 
+    type: "resend", 
+    from: `${settings?.systemName || "Jupi"} Ügyfélportál <onboarding@resend.dev>` 
+  }
 }
 
 export async function sendInviteEmail({
@@ -50,9 +53,10 @@ export async function sendInviteEmail({
   const settings = await (prisma as any).systemSettings.findUnique({ where: { id: "system" } })
   
   if (process.env.NODE_ENV !== "production" && !settings?.smtpEnabled) {
+    const sName = settings?.systemName || "Jupi"
     console.log("-----------------------------------------")
     console.log(`[EMAIL SIMULATION] Levél kiküldve: ${email}`)
-    console.log(`Kedves ${name}! Meghívót kaptál a Jupi Ügyfélportálra.`)
+    console.log(`Kedves ${name}! Meghívót kaptál a ${sName} Ügyfélportálra.`)
     console.log(`Jelszó beállítása: ${setupUrl}`)
     console.log("-----------------------------------------")
     return { success: true }
@@ -60,10 +64,11 @@ export async function sendInviteEmail({
 
   const { type, transporter, from } = await getEmailTransporter()
 
-  const subject = "Meghívó: Fiók beállítása a Jupi Ügyfélportálon"
+  const sName = settings?.systemName || "Jupi"
+  const subject = `Meghívó: Fiók beállítása a ${sName} Ügyfélportálon`
   const html = `
     <div style="font-family: Arial, sans-serif; max-w-2xl; margin: 0 auto; padding: 20px; color: #333;">
-      <h2 style="color: #0f172a;">Üdvözlünk a Jupi Ügyfélportálon, ${name}!</h2>
+      <h2 style="color: #0f172a;">Üdvözlünk a ${sName} Ügyfélportálon, ${name}!</h2>
       <p style="font-size: 16px; line-height: 1.5;">
         Az ügyintéződ létrehozott neked egy hozzáférést a modern felhőalapú könyvelői ügyfélportálunkhoz.
         Itt mindent egy helyen kezelhetsz: dokumentumok feltöltése, üzenetváltás és feladatok nyomon követése.
@@ -83,7 +88,7 @@ export async function sendInviteEmail({
       <hr style="border: none; border-top: 1px solid #eaeaea; margin: 30px 0;" />
       <p style="font-size: 12px; color: #999;">
         Ezt egy automatikus rendszerüzenet, kérlek ne válaszolj rá.<br/>
-        &copy; 2026 Jupi Könyvelőiroda. Minden jog fenntartva.
+        &copy; 2026 ${sName} Könyvelőiroda. Minden jog fenntartva.
       </p>
     </div>
   `

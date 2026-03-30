@@ -14,7 +14,7 @@ import {
   SidebarHeader
 } from "@/components/ui/sidebar"
 
-export function AppSidebar({ role, user }: { role: string, user: any }) {
+export function AppSidebar({ role, user, systemName }: { role: string, user: any, systemName: string }) {
   const items = []
   
   if (role === "SUPER_ADMIN") {
@@ -47,7 +47,7 @@ export function AppSidebar({ role, user }: { role: string, user: any }) {
   return (
     <Sidebar>
       <SidebarHeader className="h-16 flex items-center justify-center border-b">
-        <span className="text-2xl font-bold tracking-tight text-primary">JUPI</span>
+        <span className="text-2xl font-bold tracking-tight text-primary uppercase">{systemName}</span>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
